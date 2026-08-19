@@ -1,66 +1,60 @@
-# LibreRandonaut
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+# LibreRandonaut v2
 
 <img align="left" src="metadata/en-US/images/icon.png" width="170">
-LibreRandonaut is an open-source Android app for generating true random coordinates that allow users to explore their surroundings and perform the activity "randonauting". 
 
-It interfaces with [random.org](https://www.random.org/randomness/) as well as the [QRNG at the Australian National University](https://qrng.anu.edu.au/). From these providers it receives a list of quantum random numbers which are converted into coordinates. The Gaussian kernel density estimate of these coordinates is calculated to find the point with a statistically anomalous density.
+**LibreRandonaut is an open-source Android app for generating true random coordinates that allow users to explore their surroundings and perform the activity "randonauting".**
+
+> This fork is meant to make the app fit my personal needs: Android 5 support, coordinates copy button, local randomizer & stability. Currently, I consider this as a separate project & not a pull request. The development ***will** be slow* - I've never coded an actual useful Android App (apart from a YT WebWrapper 💀), but with the power of AI, I hope it will come to life some time 🗿🥀✌️
+
+*(Technical details later).*
 
 If you're unfamiliar with Randonauting, the concepts of Probability Blind-Spots and Quantum Randomness, I recommend reading [fatum_theory.txt](https://github.com/anonyhoney/fatum-en/blob/master/docs/fatum_theory.txt) that came with the original Fatum project bot that inspired another well-known commercial randonauting app. If you have no idea what this is about and are completely new to this field, you should read [this article](https://medium.com/swlh/randonauts-how-a-random-number-generator-can-set-you-free-dfc2a2413e15).
 
 ## Table of contents
-* [Benefits](#benefits)
+* [Additions Checklist](#planned-additions)
 * [Usage](#usage)
 * [Entropy sources](#entropy-sources)
-	* [Random.org](#randomorg)
-	* [ANU](#anu)
-	* [Local entropy file](#local-entropy-file)
-* [Download](#download)
 * [Screenshots](#screenshots)
 * [Donations](#donations)
 
 
-# Benefits
-- The LibreRandonaut app is and will remain completely free and open-source
-- It does not track you and spy on you
-- It is free of charge
-- You can define any radius for the generation of an attractor
-- The development version of this application supports own hardware random number generators
-- You can use this application offline (either via the file as the entropy source or via a hardware random number generator)
+## Planned Additions
+From easiest to hardest (IMO):
+- [ ] Make everything bigger, improve UI
+- [ ] Add attractor `Copy` button
+- [ ] Remove proprietary APIs, implement local randomizer
+- [ ] Speed up, remove delays
+- [ ] Remove internet requirement as well as the permission
+- [ ] Manual location input field (if ur GPS is bugged)
+- [ ] Optional notification with the attractor for easier LR :arrows_counterclockwise: Maps switching
+- [ ] Fix Android 7 instant crash on open
+- [ ] Lower Target SDK if possible (I lowkey hate A12+)
+- [ ] Compile for all platforms including x86_86
+- [ ] Android Lollipop support
+- [ ] Android L test (at least in the emulator)
 
-# Usage
+## Usage
 - Enable GPS in your phone
-- Chose the entropy source
-- Set the radius or leave at the default value of 1000 meters
-- Press Generate button to start generating an attractor in the defined area around your location
-- When generation finishes, press Open to open the attractor's location in a navigation app
+- Get location or enter it manually
+- Set the radius or leave it default
+- Press Generate button to get an attractor in the defined area around your location
+- Press Open to open the attractor's location in a navigation app, or copy if it doesn't work
+- Check what you got and go there
 
-# Entropy sources
-## Random.org
+## Entropy sources
 
-Random.org is a true random number generator which generates random numbers from atmospheric noise. This is the fastest way to generate attractors, since access is instantaneous and the daily contingent is sufficient to generate about 100 attractors at a radius of 1000 meters.
+*(To be rewritten).*
 
-## ANU
-See [QRNG at the Australian National University](https://qrng.anu.edu.au/). 
+## Screenshots
 
-The original API for ANU was limited to one request per minute. For the generation of an attractor within a radius of 1000 meters several requests are needed. This leads to a waiting time of about 4 minutes.
-
-## Local entropy file
-Another interesting aspect is the temporal independence between generating the entropy and applying it in the context of randonauting. You can generate entropy and use it for randonauting at any time later. The results of randonauting should be similar as if you would generate entropy directly, for example by ANU.
-
-If you choose a file as entropy source, you must have a binary file with random bytes saved on your phone. You can generate this file with a RNG hardware device or download it from [random.org/bytes](https://www.random.org/bytes/). The LibreRandonaut app takes care not to use the same bytes from an entropy file more than once. As soon as all bytes from the file are used up for generation, a warning message is displayed if another attempt is made.
-
-If you provide a file, make sure it contains enough entropy. To create an attractor in a 1000 meter radius, about 1.2 kByte of entropy is needed.
-
-Another advantage of the local entropy file is that it can be used to prepare random data prior to a trip, which can later be used for randonauting regardless of the availability of mobile network connectivity.
-
-# Download
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="75">](https://f-droid.org/de/packages/com.github.librerandonaut.librerandonaut/)
-[<img src="img/apk.png" alt="Get it on GitHub" height="75">](https://github.com/librerandonaut/librerandonaut/releases)
-
-# Screenshots
+### v1.x
 
 <img src="metadata/en-US/images/phoneScreenshots/1.png" width="170"> <img src="metadata/en-US/images/phoneScreenshots/2.png" width="170">
 
-# Donations
-- BTC / BCH / BSV: 1FjQbwejnsfNoZfy92LGkMhDy2ZtPBzgsd
+### v2.x
+
+*Coming Soon ⏲️*
+
+## Donations
+- **All Tips Shall Go To The Original Dev: `BTC / BCH / BSV: 1FjQbwejnsfNoZfy92LGkMhDy2ZtPBzgsd`**
+- <sup>And I don't need nothing apart from a working app XD</sup>
