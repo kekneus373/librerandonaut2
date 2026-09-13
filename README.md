@@ -1,6 +1,9 @@
 # LibreRandonaut v2
 
-<img align="left" src="metadata/en-US/images/icon.png" width="170">
+<img align="left"
+alt="Application icon"
+src="metadata/en-US/images/icon.png" 
+width="170">
 
 **LibreRandonaut is an open-source Android app for generating true random coordinates that allow users to explore their surroundings and perform the activity "randonauting".**
 
@@ -20,6 +23,10 @@ If you're unfamiliar with Randonauting, the concepts of Probability Blind-Spots 
 
 ## Planned Additions
 From easiest to hardest (IMO):
+- [x] Upgrade Gradle
+- [...] Set JDK to 1.7 (Java 7)
+- [...] Remove Test Stuff
+- [ ] Android Lollipop support (`minSdk=22`)
 - [ ] Make everything bigger, improve UI
 - [ ] Add attractor `Copy` button
 - [ ] Remove proprietary APIs, implement local randomizer
@@ -28,9 +35,8 @@ From easiest to hardest (IMO):
 - [ ] Manual location input field (if ur GPS is bugged)
 - [ ] Optional notification with the attractor for easier LR :arrows_counterclockwise: Maps switching
 - [ ] Fix Android 7 instant crash on open
-- [ ] Lower Target SDK if possible (I lowkey hate A12+)
+- [ ] Lower Target SDK to 30
 - [ ] Compile for all platforms including x86_86
-- [ ] Android Lollipop support
 - [ ] Android L test (at least in the emulator)
 
 ## Usage
@@ -47,9 +53,14 @@ From easiest to hardest (IMO):
 
 ## Screenshots
 
-### v1.x
+### v1.0.1
 
-<img src="metadata/en-US/images/phoneScreenshots/1.png" width="170"> <img src="metadata/en-US/images/phoneScreenshots/2.png" width="170">
+<img src="metadata/en-US/images/phoneScreenshots/1.png" 
+width="170"
+alt="Application Screenshot"> <img
+        src="metadata/en-US/images/phoneScreenshots/2.png"
+        width="170"
+alt="Application Screenshot">
 
 ### v2.x
 
