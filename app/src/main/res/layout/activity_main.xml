@@ -12,6 +12,7 @@
         android:layout_height="113dp"
         android:layout_marginStart="5dp"
         android:clickable="true"
+        android:focusable="true"
         android:lines="100"
         android:maxLines="100"
         android:onClick="onLabelAttractorDataTouch"
@@ -38,17 +39,6 @@
         app:layout_constraintTop_toTopOf="@+id/label1" />
 
     <TextView
-        android:id="@+id/labelDevice"
-        android:layout_width="234dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="16dp"
-        android:lines="2"
-        android:maxLines="2"
-        android:text=""
-        app:layout_constraintStart_toEndOf="@+id/buttonGenerate"
-        app:layout_constraintTop_toTopOf="@+id/buttonGenerate" />
-
-    <TextView
         android:id="@+id/labelAttractor"
         android:layout_width="297dp"
         android:layout_height="60dp"
@@ -66,7 +56,7 @@
         android:layout_marginTop="12dp"
         android:lines="1"
         android:maxLines="1"
-        android:text="Attractor: "
+        android:text="@string/attractor"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="@+id/label"
         app:layout_constraintTop_toBottomOf="@+id/textBoxRadius" />
@@ -79,7 +69,7 @@
         android:layout_marginTop="16dp"
         android:lines="1"
         android:maxLines="1"
-        android:text="Radius: "
+        android:text="@string/radius"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="@+id/buttonGenerate"
         app:layout_constraintTop_toBottomOf="@+id/buttonGenerate" />
@@ -88,7 +78,8 @@
         android:id="@+id/textBoxRadius"
         android:layout_width="317dp"
         android:layout_height="51dp"
-        android:text="1000"
+        android:importantForAutofill="no"
+        android:text="@string/_1000"
         app:layout_constraintStart_toEndOf="@+id/label"
         app:layout_constraintTop_toTopOf="@+id/label" />
 
@@ -100,24 +91,24 @@
         android:layout_marginTop="16dp"
         android:lines="1"
         android:maxLines="1"
-        android:text="Location: "
+        android:text="@string/location"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/buttonOpen"
-        android:layout_width="101dp"
-        android:layout_height="41dp"
+        android:layout_width="184dp"
+        android:layout_height="74dp"
         android:layout_marginTop="12dp"
         android:onClick="onButtonOpenTouch"
-        android:text="Open"
+        android:text="@string/open"
         app:layout_constraintStart_toStartOf="@+id/label2"
         app:layout_constraintTop_toBottomOf="@+id/labelAttractor" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="396dp"
-        android:layout_height="42dp"
+        android:layout_width="394dp"
+        android:layout_height="73dp"
         android:layout_marginTop="12dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,57 +119,26 @@
         <RadioButton
             android:id="@+id/radioButtonRandomDotOrg"
             android:layout_width="140dp"
+            android:layout_height="75dp"
             android:checked="true"
-            android:text="random.org"></RadioButton>
+            android:text="@string/random_org" />
 
         <RadioButton
             android:id="@+id/radioButtonAnu"
             android:layout_width="100dp"
-            android:text="ANU"></RadioButton>
+            android:layout_height="74dp"
+            android:text="@string/anu" />
 
-        <RadioButton
-            android:id="@+id/radioButtonFile"
-            android:layout_width="100dp"
-            android:text="File"></RadioButton>
-
-    </RadioGroup>
-
-    <RadioGroup
-        android:id="@+id/radioGroup2"
-        android:layout_width="393dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@+id/radioGroup"
-        app:layout_constraintHorizontal_bias="0.333"
-        app:layout_constraintStart_toStartOf="@+id/radioGroup"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup">
-
-        <RadioButton
-            android:id="@+id/radioButtonGaussKde1"
-            android:layout_width="90dp"
-            android:checked="true"
-            android:text="KDE 1"
-            android:visibility="gone"
-            tools:visibility="gone"></RadioButton>
-
-        <RadioButton
-            android:id="@+id/radioButtonGaussKde2"
-            android:layout_width="90dp"
-            android:text="KDE 2"
-            android:visibility="gone"
-            tools:visibility="gone"></RadioButton>
     </RadioGroup>
 
     <Button
         android:id="@+id/buttonGenerate"
-        android:layout_width="141dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="182dp"
+        android:layout_height="75dp"
         android:onClick="onButtonGenerateTouch"
-        android:text="Generate"
+        android:text="@string/generate"
         app:layout_constraintStart_toStartOf="@+id/radioGroup"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup2" />
+        tools:layout_editor_absoluteY="161dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

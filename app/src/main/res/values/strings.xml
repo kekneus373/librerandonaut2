@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">LibreRandonaut</string>
+    <string name="app_name" translatable="false">LibreRandonaut v2</string>
+    <string name="attractor">Attractor:</string>
+    <string name="radius">Radius:</string>
+    <string name="_1000" translatable="false">1000</string>
+    <string name="location">Location:</string>
+    <string name="open">Open</string>
+    <string name="random_org" translatable="false">random.org</string>
+    <string name="anu" translatable="false">ANU</string>
+    <string name="generate">Generate</string>
 </resources>

@@ -2,29 +2,21 @@ package com.github.librerandonaut.librerandonaut;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
@@ -37,15 +29,7 @@ import android.widget.TextView;
 
 import com.github.librerandonaut.librerandonaut.randomness.LoadRandomProviderResult;
 import com.github.librerandonaut.librerandonaut.randomness.RandomDotOrgEntropyManager;
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.github.librerandonaut.librerandonaut.attractor.Attractor;
 import com.github.librerandonaut.librerandonaut.attractor.AttractorGeneratorFactory;
@@ -53,44 +37,28 @@ import com.github.librerandonaut.librerandonaut.attractor.AttractorGeneratorType
 import com.github.librerandonaut.librerandonaut.attractor.Coordinates;
 import com.github.librerandonaut.librerandonaut.attractor.IAttractorGenerator;
 import com.github.librerandonaut.librerandonaut.attractor.RandomPointsProvider;
-import com.github.librerandonaut.librerandonaut.randomness.DeviceEntropyManager;
-import com.github.librerandonaut.librerandonaut.randomness.FileEntropyManager;
 import com.github.librerandonaut.librerandonaut.randomness.IRandomProvider;
 import com.github.librerandonaut.librerandonaut.randomness.AnuEntropyManager;
 import com.github.librerandonaut.librerandonaut.randomness.RandomSource;
-import com.github.librerandonaut.librerandonaut.randomness.SystemEntropyManager;
-import com.github.librerandonaut.librerandonaut.rngdevice.DeviceHandler;
 import com.github.librerandonaut.librerandonaut.rngdevice.IProgressHandler;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     static final String TAG = "MainActivity";
     private Button buttonGenerate;
     private Button buttonOpen;
-    private TextView labelDevice;
     private TextView labelLocation;
     private TextView labelAttractor;
     private TextView labelAttractorData;
     private TextView labelRandomData;
     private RadioButton radioButtonAnu;
     private RadioButton radioButtonRandomDotOrg;
-    private RadioButton radioButtonFile;
-    private RadioButton radioButtonDevice;
-    private RadioButton radioButtonSystem;
-    private RadioButton radioButtonFatum;
-    private RadioButton radioButtonGaussKde1;
-    private RadioButton radioButtonGaussKde2;
     private EditText textBoxRadius;
-    private ProgressDialog progressDialog;
-    private LocationManager locationManager;
     private SharedPreferences sharedPref;
     private Coordinates coordinates;
     private Attractor attractor;
-    private DeviceHandler deviceHandler = new DeviceHandler(this);
-    private Uri selectedFile;
 
     private static int roundDecimals = 7;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,16 +70,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void requestLocation() {
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            labelLocation.setText("GPS not enabled");
+            labelLocation.setText("GPS is not enabled.");
             new AlertDialog.Builder(MainActivity.this)
-                    .setMessage("GPS Enable")
-                    .setPositiveButton("Settings", (paramDialogInterface, paramInt) -> startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 1))
-                    .setNegativeButton("Cancel", null)
+                    .setMessage("Enable GPS in Settings?")
+                    .setPositiveButton("Yes", (paramDialogInterface, paramInt) -> startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 1))
+                    .setNegativeButton("Skip", null)
                     .show();
         } else {
-            labelLocation.setText("Loading ...");
+            labelLocation.setText("Fetching coordinates...");
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         }
@@ -130,8 +108,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 break;
 
             case 2:
-                selectedFile = data.getData();
-                labelDevice.setText(selectedFile.getPath());
+                // TODO: Allow filling in coordinates manually in case of denied GPS permission.
                 break;
         }
     }
@@ -140,25 +117,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void initComponents() {
         labelRandomData = findViewById(R.id.labelRandomData);
         labelRandomData.setMovementMethod(new ScrollingMovementMethod());
-
-        labelDevice = findViewById(R.id.labelDevice);
         labelLocation = findViewById(R.id.labelLocation);
         labelAttractor = findViewById(R.id.labelAttractor);
         radioButtonAnu = findViewById(R.id.radioButtonAnu);
         radioButtonRandomDotOrg = findViewById(R.id.radioButtonRandomDotOrg);
-        radioButtonFile = findViewById(R.id.radioButtonFile);
-        //radioButtonDevice = findViewById(R.id.radioButtonDevice);
-        //radioButtonSystem = findViewById(R.id.radioButtonSystem);
-        //radioButtonFatum = findViewById(R.id.radioButtonFatum);
-        radioButtonGaussKde1 = findViewById(R.id.radioButtonGaussKde1);
-        radioButtonGaussKde2 = findViewById(R.id.radioButtonGaussKde2);
         textBoxRadius = findViewById(R.id.textBoxRadius);
         labelAttractorData = findViewById(R.id.labelAttractorData);
         labelAttractorData.setMovementMethod(new ScrollingMovementMethod());
 
         buttonGenerate = findViewById(R.id.buttonGenerate);
-        // TODO: DEBUG
-        //buttonGenerate.setEnabled(false);
         coordinates = new Coordinates(48, 8.5);
 
         buttonOpen = findViewById(R.id.buttonOpen);
@@ -168,55 +135,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         labelAttractor.setText("");
 
         sharedPref = getPreferences(Context.MODE_PRIVATE);
-
-        /*radioButtonDevice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Device device = deviceHandler.getProposedDevice();
-                if( device != null) {
-                    labelDevice.setText(device.toString());
-                } else {
-                    labelDevice.setText("device not found");
-                }
-            }
-        });*/
-
-        radioButtonFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent()
-                        .setType("*/*")
-                        .addCategory(Intent.CATEGORY_OPENABLE)
-                        .setAction(Intent.ACTION_GET_CONTENT);
-
-                startActivityForResult(Intent.createChooser(intent, "Select file"), 2);
-            }
-        });
     }
-
-    private static final String ACTION_USB_PERMISSION =
-            "com.android.example.USB_PERMISSION";
-
-    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if(device != null){
-                            //call method to set up device communication
-                        }
-                    }
-                    else {
-                        Log.d(TAG, "permission denied for device " + device);
-                    }
-                }
-            }
-        }
-    };
 
     private void handlePermissions() {
         // GPS
@@ -225,23 +144,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 666);
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 666);
         }
-
-        // File access
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        666);
-            }
-        }
-
-        // TODO: TRNG USB device disabled
-        // USB Devices
-        // deviceHandler.requestPermissions();
     }
 
     public void onLabelAttractorDataTouch(View view) throws Exception {
@@ -266,32 +168,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         RandomSource randomSource = RandomSource.Anu;
 
-        if (radioButtonAnu.isChecked()) {
-            randomSource = RandomSource.Anu;
-        } else if (radioButtonRandomDotOrg.isChecked()) {
+        if (radioButtonRandomDotOrg.isChecked()) {
             randomSource = RandomSource.RandomDotOrg;
-        } else if (radioButtonFile.isChecked()) {
-            randomSource = RandomSource.File;
-        } else if (radioButtonDevice.isChecked()) {
-            randomSource = RandomSource.Device;
-        } /*else if (radioButtonSystem.isChecked()) {
-            randomSource = RandomSource.System;
-        }*/
-
-        AttractorGeneratorType generatorType = AttractorGeneratorType.Fatum;
-        /*if (radioButtonFatum.isChecked()) {
-            generatorType = AttractorGeneratorType.Fatum;
-        } else */
-
-        // TODO: Disabled kde2 because its library (libs/kde/target/bits_kde.jar) does not build correctly with f-droid
-        generatorType = AttractorGeneratorType.Kde1;
-        /*
-        if(radioButtonGaussKde1.isChecked()) {
-            generatorType = AttractorGeneratorType.Kde1;
-        } else if(radioButtonGaussKde2.isChecked()) {
-            generatorType = AttractorGeneratorType.Kde2;
         }
-        */
+
+        AttractorGeneratorType generatorType;
+
+        // TODO: Disabled kde2 because its library (libs/kde/target/bits_kde.jar) does not build correctly with f-droid. Complete Removal awaits.
+        generatorType = AttractorGeneratorType.Kde1;
         GenerateAsyncTask asyncTask = new GenerateAsyncTask();
         AttractorGenerationRequest request = new AttractorGenerationRequest();
         request.coordinates = coordinates;
@@ -364,11 +248,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         private final static String RANDOM_DOT_ORG_QUOTA = "random_dot_org_quota";
         private final static String RANDOM_DOT_ORG_QUOTA_TIMESTAMP = "random_dot_org_quota_timestamp";
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        protected void onProgressUpdate(Integer... progress) {
-            progressDialog.setMessage("Please wait... fetching data and generating attractor. Progress " + progress[0] + "%");
-        }
-
         @Override
         protected AttractorGenerationResult doInBackground(AttractorGenerationRequest... requests) {
 
@@ -407,8 +286,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             } catch (Exception e) {
                 Log.w(TAG, e);
             }
-
-            publishProgress(100);
+            buttonGenerate.setEnabled(true);
             return result;
         }
 
@@ -437,26 +315,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             LoadRandomProviderResult loadRandomProviderResult = null;
             try {
                 switch (requests[0].randomSource) {
-                    case File:
-                        loadRandomProviderResult = new FileEntropyManager(selectedFile, MainActivity.this).loadRandomProvider(entropyUsage);
-                        {
-                            IRandomProvider randomProvider = loadRandomProviderResult.getRandomProvider();
-                            if (randomProvider != null) {
-                                int hashCode = randomProvider.getHashCode();
-                                result.bytesHashCode = hashCode;
-                                int byteIndex = sharedPref.getInt(ENTROPY_BYTE_INDEX_PREFIX + hashCode, 0);
-                                Log.w(TAG, "Read byte index " + byteIndex + " for hash " + result.bytesHashCode);
-                                randomProvider.setByteIndex(byteIndex);
-                            }
-                        }
-                        break;
-                    case System:
-                        loadRandomProviderResult = new SystemEntropyManager().loadRandomProvider(entropyUsage);
-                        break;
-                    case Device:
-                        DeviceEntropyManager deviceEntropyManager = new DeviceEntropyManager(deviceHandler, this);
-                        loadRandomProviderResult = deviceEntropyManager.loadRandomProvider(entropyUsage);
-                        break;
                     case Anu:
                         loadRandomProviderResult = new AnuEntropyManager(this).loadRandomProvider(entropyUsage);
                         break;
@@ -507,12 +365,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         protected void onPreExecute() {
             super.onPreExecute();
             MainActivity.this.buttonGenerate.setEnabled(false);
-
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage("Please wait... generating attractor.");
-            progressDialog.setIndeterminate(false);
-            progressDialog.setCancelable(false);
-            progressDialog.show();
         }
 
         @Override
@@ -536,7 +388,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             if (result.attractor != null) {
                 showAttractorInformation(result);
-                persistAttractorData(result);
             } else {
                 String s = "attractor generation failed.";
                 s += "\n";
@@ -551,30 +402,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
                 labelAttractorData.setText(s);
             }
-            progressDialog.hide();
+            buttonGenerate.setEnabled(true);
         }
 
         @Override
         public void updateProgress(int percent) {
             publishProgress(percent);
-        }
-    }
-
-    private void persistAttractorData(AttractorGenerationResult result) {
-        Gson gson = new Gson();
-        String json = gson.toJson(result.attractor);
-        String id = result.attractor.getIdentifier();
-        writeToFile(json, id, this);
-    }
-
-    private void writeToFile(String data, String fileName, Context context) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
         }
     }
 }
